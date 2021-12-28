@@ -17,14 +17,13 @@ class OrderedSet:
         if not self._first:
             self._first = item
 
-        if item not in self._items.keys():
-            self._items[item] = item, [self._last, None]
-            if len(self._items) != 1:
-                self._items[self._last][1][1] = item
-            self._last = item
-            return self.__len__() - 1
-        else:
+        if item in self._items.keys():
             return self.get_all().index(item)
+        self._items[item] = item, [self._last, None]
+        if len(self._items) != 1:
+            self._items[self._last][1][1] = item
+        self._last = item
+        return self.__len__() - 1
 
     def update(self, *items):
         """
@@ -147,11 +146,8 @@ class OrderedSet:
         :return: (bool) If the set has no elements in common with other return True.
         """
 
-        for element in other:
-            if element in self:
-                return False
 
-        return True
+        return all(element not in self for element in other)
 
     def is_subset(self, other):
         """
@@ -161,11 +157,8 @@ class OrderedSet:
         :return: (bool) If the set is a subset of ``other`` return ``True``.
         """
         
-        for element in self:
-            if element not in other:
-                return False
 
-        return True
+        return all(element in other for element in self)
 
     def is_superset(self, other):
         """
@@ -175,11 +168,8 @@ class OrderedSet:
         :return: (bool) If the set is the superset of ``other`` return ``True``.
         """
         
-        for element in other:
-            if element not in self:
-                return False
 
-        return True
+        return all(element in self for element in other)
 
     def intersection(self, *other):
         """
@@ -239,14 +229,14 @@ class OrderedSet:
 
     def __getitem__(self, index):
         if index < 0:
-            return tuple(i for i in self)[index]
+            return tuple(self)[index]
 
         if self.__len__() >= index:
             IndexError("Index is out of range")
 
         item = self._first
 
-        for i in range(index):
+        for _ in range(index):
             item = self._items[self._items[item][1][1]][0]
 
         return item
@@ -266,7 +256,7 @@ class OrderedSet:
         return len(self._items)
 
     def __str__(self):
-        items = tuple(i for i in self)
+        items = tuple(self)
         return "OrderedSet("+', '.join(['{}']*(len(items))).format(*items) + ")"
 
     def __eq__(self, other):

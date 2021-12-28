@@ -86,7 +86,7 @@ def test_equality():
     assert s == s2
     s2.remove(1)
     s2.add(1)
-    assert not s == s2
+    assert s != s2
 
 
 def test_uniqueness(filled_set):
@@ -101,9 +101,7 @@ def test_add_unhashable():
 
 
 def test_drain(filled_set):
-    total = 0
-    for num in filled_set.drain():
-        total += num
+    total = sum(filled_set.drain())
     assert total == 21
     assert filled_set.is_empty()
 
